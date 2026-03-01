@@ -6,81 +6,85 @@ export async function POST(request) {
   try {
     const supabase = await createClient();
     const body = await request.json();
-    const { rifaId, nombre, telefono, totalBoletos } = body;
+    const {
+      rifa_id,
+      nombre,
+      cedula,
+      telefono,
+      correo,
+      cantidad,
+      metodo_pago,
+      referencia_pago,
+      comprobante_url,
+      folio: folioFrontend,
+    } = body;
 
-    // 0. Consultar datos de la rifa (para el precio)
+    // 0. Consultar datos de la rifa
     const { data: rifa, error: errorRifa } = await supabase
       .from("rifas")
       .select("*")
-      .eq("id", rifaId)
+      .eq("id", rifa_id)
       .single();
 
     if (errorRifa || !rifa) throw new Error("Rifa no encontrada");
 
-    // 1. Consultar números ya usados con validación de nulidad
+    // 1. Consultar números ya usados
     const { data: usados, error: errorFetch } = await supabase
       .from("boletos")
       .select("numero_boleto")
-      .eq("rifa_id", rifaId)
-      .in("estado", ["pendiente", "pagado"]); // Solo los que están apartados o pagados
+      .eq("rifa_id", rifa_id)
+      .in("estado", ["pendiente", "pagado"]);
 
-    if (errorFetch) {
-      console.error("Error al consultar boletos usados:", errorFetch);
-      throw new Error(
-        `Error al consultar disponibilidad: ${errorFetch.message}`,
-      );
-    }
-
-    // Aplanamos todos los números usados de todas las filas (manejando comas)
     const numerosUsados = usados
       ? usados.flatMap((b) =>
           b.numero_boleto.split(",").map((n) => parseInt(n.trim())),
         )
       : [];
 
-    // 2. Lógica de disponibilidad OPTIMIZADA
+    // 2. Lógica de disponibilidad
     const limiteRifa = rifa.total_boletos || 1000;
-    const usadosSet = new Set(numerosUsados); // Un Set es 1000x más rápido para buscar
+    const usadosSet = new Set(numerosUsados);
     const seleccionados = [];
 
-    // Intentamos buscar números al azar de forma eficiente
-    while (seleccionados.length < totalBoletos) {
+    while (seleccionados.length < cantidad) {
       const numAleatorio = Math.floor(Math.random() * limiteRifa) + 1;
-
-      // Si el número no está en usados y no ha sido seleccionado en este ciclo
       if (
         !usadosSet.has(numAleatorio) &&
         !seleccionados.includes(numAleatorio)
       ) {
         seleccionados.push(numAleatorio);
       }
-
-      // Salvaguarda: si por alguna razón no hay suficientes (muy raro por el check anterior)
       if (usadosSet.size + seleccionados.length >= limiteRifa) break;
     }
 
-    if (seleccionados.length < totalBoletos) {
+    if (seleccionados.length < cantidad) {
       return NextResponse.json(
         { error: "No hay suficientes boletos disponibles" },
         { status: 400 },
       );
     }
 
-    const folio = `RIFA-2026-${Math.random().toString(36).toUpperCase().substring(2, 6)}`;
+    const finalFolio =
+      folioFrontend ||
+      `RIFA-${new Date().getFullYear()}-${Math.random().toString(36).toUpperCase().substring(2, 6)}`;
 
-    // 3. Insertar con los nombres de columna exactos de tu DB
+    // 3. Insertar con los nuevos campos
     const { data: insertedData, error: errorInsert } = await supabase
       .from("boletos")
       .insert([
         {
-          rifa_id: rifaId,
+          rifa_id,
           numero_boleto: seleccionados.join(", "),
-          folio: folio,
+          folio: finalFolio,
           comprador_nombre: nombre,
+          comprador_cedula: cedula,
           comprador_telefono: telefono,
-          estado: "pendiente", // Inicia como pendiente
-          monto_pagado: totalBoletos * rifa.precio_boleto,
-          referencia_pago: "PENDIENTE",
+          comprador_correo: correo,
+          metodo_pago,
+          estado: "pendiente",
+          monto_pagado: cantidad * rifa.precio_boleto,
+          referencia_pago,
+          comprobante_url,
         },
       ])
       .select()
@@ -91,51 +95,49 @@ export async function POST(request) {
       return NextResponse.json({ error: errorInsert.message }, { status: 500 });
     }
 
-    // 4. Actualizar el contador de vendidos en la rifa (incluyendo apartados)
-    const nuevosVendidos = (rifa.boletos_vendidos || 0) + totalBoletos;
-    const { error: errorRifaUpdate } = await supabase
+    // 4. Actualizar el contador de vendidos
+    const nuevosVendidos = (rifa.boletos_vendidos || 0) + cantidad;
+    await supabase
       .from("rifas")
       .update({ boletos_vendidos: nuevosVendidos })
-      .eq("id", rifaId);
+      .eq("id", rifa_id);
 
-    if (errorRifaUpdate) {
-      console.error("Error updating rifa sales:", errorRifaUpdate);
-      // Opcional: podrías decidir si fallar aquí o continuar
-    }
-
-    // 5. Registrar actividad
+    // 5. Registrar actividad con metadata detallada
     await supabase.from("actividades").insert([
       {
         tipo: "reserva",
-        descripcion: `Nueva reserva: ${nombre} (${totalBoletos} boletos)`,
-        monto: 0, // Las reservas no cuentan como ingreso hasta que se pagan
+        descripcion: `Nueva reserva: ${nombre} (${cantidad} boletos por ${metodo_pago})`,
+        monto: 0,
         metadata: {
-          folio: folio,
+          folio: finalFolio,
           comprador: nombre,
+          cedula: cedula,
+          metodo_pago: metodo_pago,
           rifa_nombre: rifa.nombre,
-          cantidad: totalBoletos,
+          cantidad: cantidad,
           boleto_id: insertedData.id,
+          referencia: referencia_pago,
         },
       },
     ]);
 
-    // 6. Revalidar rutas para limpiar caché de Next.js
     revalidatePath(`/rifa/${rifa.slug}`);
     revalidatePath("/admin");
     revalidatePath("/admin/finanzas");
 
     return NextResponse.json(
       {
+        success: true,
         id: insertedData.id,
         numeros: seleccionados,
-        folio: folio,
+        folio: finalFolio,
       },
       { status: 200 },
     );
   } catch (error) {
     console.error("Critical API Error:", error);
     return NextResponse.json(
-      { error: "Error interno del servidor" },
+      { success: false, error: error.message || "Error interno del servidor" },
       { status: 500 },
     );
   }

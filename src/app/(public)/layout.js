@@ -16,7 +16,7 @@ export default function PublicLayout({ children }) {
               size={24}
               strokeWidth={3}
             />
-            TREBOL<span className="text-emerald-500">SONORENSE</span>
+            GANA CON<span className="text-emerald-500">EL GOCHO</span>
           </Link>
 
           <div className="flex items-center gap-6">
@@ -37,7 +37,7 @@ export default function PublicLayout({ children }) {
       <footer className="border-t border-zinc-200 dark:border-zinc-800 py-10">
         <div className="max-w-6xl mx-auto px-6 text-center">
           <p className="text-sm text-zinc-400 font-medium">
-            © {new Date().getFullYear()} Trebol Sonorense. Todos los derechos
+            © {new Date().getFullYear()} Gana con el Gocho. Todos los derechos
             reservados.
           </p>
         </div>

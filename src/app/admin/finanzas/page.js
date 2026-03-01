@@ -12,58 +12,75 @@ export default async function FinanzasPage({ searchParams }) {
   if (range === "hoy") {
     startDate.setHours(0, 0, 0, 0);
   } else if (range === "semana") {
-    // 7 días atrás
     startDate.setDate(now.getDate() - 7);
+    startDate.setHours(0, 0, 0, 0);
   } else {
-    // 30 días atrás (mes por defecto)
     startDate.setDate(now.getDate() - 30);
+    startDate.setHours(0, 0, 0, 0);
   }
 
-  // 1. Obtener ingresos del periodo (solo 'pago')
-  const { data: pagosPeriodo } = await supabase
+  // 1. Obtener ingresos del periodo desde ACTIVIDADES (Logs)
+  const { data: pagosLog } = await supabase
     .from("actividades")
     .select("*")
     .eq("tipo", "pago")
     .gte("created_at", startDate.toISOString())
     .order("created_at", { ascending: false });
 
-  // 2. Obtener estadísticas de todas las rifas para ver avance
+  // 2. Obtener boletos pagados en el periodo (Basado en created_at del boleto como backup)
+  const { data: boletosPagadosPeriodo } = await supabase
+    .from("boletos")
+    .select("monto_pagado, created_at")
+    .eq("estado", "pagado")
+    .gte("created_at", startDate.toISOString());
+
+  // 3. Obtener todas las rifas
   const { data: rifas } = await supabase
     .from("rifas")
     .select("*")
     .order("created_at", { ascending: false });
 
   // Cálculos de periodo
+  // Usamos el log de actividades si tiene datos, si no, los boletos del periodo
   const recaudacionPeriodo =
-    pagosPeriodo?.reduce((acc, curr) => acc + (curr.monto || 0), 0) || 0;
-  const boletosVendidosPeriodo = pagosPeriodo?.length || 0;
+    pagosLog?.length > 0
+      ? pagosLog.reduce((acc, curr) => acc + Number(curr.monto || 0), 0)
+      : boletosPagadosPeriodo?.reduce(
+          (acc, curr) => acc + Number(curr.monto_pagado || 0),
+          0,
+        ) || 0;
 
-  // Cálculos totales históricos (desde boletos pagados)
+  const ventasPeriodo =
+    pagosLog?.length > 0 ? pagosLog.length : boletosPagadosPeriodo?.length || 0;
+
+  // Cálculos totales históricos
   const { data: todosLosPagos } = await supabase
     .from("boletos")
     .select("monto_pagado")
     .eq("estado", "pagado");
 
   const ingresosHistoricos =
-    todosLosPagos?.reduce((acc, curr) => acc + (curr.monto_pagado || 0), 0) ||
-    0;
+    todosLosPagos?.reduce(
+      (acc, curr) => acc + Number(curr.monto_pagado || 0),
+      0,
+    ) || 0;
 
   const stats = [
     {
       name: `Ingresos (${range})`,
-      value: `$${recaudacionPeriodo.toLocaleString()} MXN`,
+      value: `$${recaudacionPeriodo.toLocaleString()} BS`,
       color: "text-emerald-500",
       icon: "💰",
     },
     {
       name: `Ventas (${range})`,
-      value: boletosVendidosPeriodo,
+      value: ventasPeriodo,
       color: "text-blue-500",
       icon: "🎟️",
     },
     {
       name: "Ingresos Totales",
-      value: `$${ingresosHistoricos.toLocaleString()} MXN`,
+      value: `$${ingresosHistoricos.toLocaleString()} BS`,
       color: "text-purple-500",
       icon: "📈",
     },
@@ -179,31 +196,49 @@ export default async function FinanzasPage({ searchParams }) {
           </h3>
 
           <div className="flex-1 space-y-4">
-            {pagosPeriodo && pagosPeriodo.length > 0 ? (
-              pagosPeriodo.map((pago) => (
+            {pagosLog && pagosLog.length > 0 ? (
+              pagosLog.map((pago) => (
                 <div
                   key={pago.id}
                   className="flex items-center justify-between p-4 bg-zinc-950/50 border border-zinc-800 rounded-2xl hover:border-zinc-700 transition-colors"
                 >
-                  <div className="min-w-0">
-                    <p className="text-sm font-bold text-white truncate">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold text-white truncate uppercase">
                       {pago.metadata?.comprador}
                     </p>
-                    <p className="text-[10px] text-zinc-500 uppercase font-black tracking-widest mt-0.5">
-                      Folio: {pago.metadata?.folio || "---"} •{" "}
-                      {new Date(pago.created_at).toLocaleDateString()}
-                    </p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-[9px] font-black uppercase tracking-tighter bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded border border-zinc-700">
+                        {pago.metadata?.metodo_pago?.replace("_", " ") || "S/M"}
+                      </span>
+                      <p className="text-[10px] text-zinc-500 uppercase font-black tracking-widest">
+                        Folio: {pago.metadata?.folio || "---"}
+                      </p>
+                    </div>
                   </div>
                   <div className="text-right ml-4">
                     <p className="text-emerald-500 font-black text-base">
-                      +${(pago.monto || 0).toLocaleString()}
+                      +${Number(pago.monto || 0).toLocaleString()}
                     </p>
-                    <span className="text-[10px] font-black uppercase tracking-tighter bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                      Confirmado
-                    </span>
+                    <p className="text-[9px] text-zinc-500 font-bold uppercase mt-0.5">
+                      {new Date(pago.created_at).toLocaleDateString()}
+                    </p>
                   </div>
                 </div>
               ))
+            ) : boletosPagadosPeriodo && boletosPagadosPeriodo.length > 0 ? (
+              <div className="space-y-4">
+                <p className="text-[10px] text-zinc-500 font-bold uppercase text-center bg-zinc-950 p-2 rounded-xl mb-4">
+                  Mostrando resumen de boletos (Log de actividades vacío)
+                </p>
+                <div className="flex flex-col items-center justify-center py-10 text-zinc-600">
+                  <p className="text-emerald-500 font-black text-2xl">
+                    ${recaudacionPeriodo.toLocaleString()}
+                  </p>
+                  <p className="text-[10px] font-black text-zinc-500 uppercase">
+                    Recaudación estimada del periodo
+                  </p>
+                </div>
+              </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-20 text-zinc-600">
                 <span className="text-4xl mb-4 grayscale opacity-20">📊</span>

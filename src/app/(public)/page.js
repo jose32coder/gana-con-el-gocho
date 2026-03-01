@@ -53,9 +53,14 @@ export default async function HomePage() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="flex flex-wrap justify-center gap-8 w-full">
             {rifas.map((rifa) => (
-              <RifaCard key={rifa.slug} rifa={rifa} />
+              <div
+                key={rifa.slug}
+                className="w-full md:w-[calc(50%-2rem)] lg:w-[calc(33.333%-2rem)] max-w-sm"
+              >
+                <RifaCard rifa={rifa} />
+              </div>
             ))}
           </div>
         )}

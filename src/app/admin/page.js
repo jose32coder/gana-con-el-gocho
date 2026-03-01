@@ -34,7 +34,7 @@ export default async function AdminDashboard() {
   const stats = [
     {
       name: "Recaudación Total",
-      value: `$${totalPagado.toLocaleString()} MXN`,
+      value: `$${totalPagado.toLocaleString()} BS`,
       icon: "💰",
       color: "text-emerald-500",
     },

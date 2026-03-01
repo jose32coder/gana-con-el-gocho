@@ -62,9 +62,9 @@ export default async function RifaDetallePage(props) {
                     Costo por Boleto
                   </p>
                   <p className="text-4xl font-black text-zinc-900 dark:text-white">
-                    ${rifa.precio_boleto.toLocaleString()}{" "}
+                    {rifa.precio_boleto.toLocaleString()}{" "}
                     <span className="text-sm font-normal text-zinc-500">
-                      MXN
+                      BS
                     </span>
                   </p>
                 </div>

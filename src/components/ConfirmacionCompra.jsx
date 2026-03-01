@@ -52,7 +52,7 @@ export default function ConfirmacionCompra({ datos }) {
                 Total Pagado
               </p>
               <p className="text-sm font-black text-emerald-500">
-                ${datos.total} MXN
+                ${datos.total} BS
               </p>
             </div>
           </div>

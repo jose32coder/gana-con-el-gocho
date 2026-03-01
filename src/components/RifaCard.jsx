@@ -73,8 +73,8 @@ export default function RifaCard({ rifa }) {
                 Costo
               </span>
               <span className="text-2xl sm:text-xl font-black text-emerald-600 dark:text-emerald-400">
-                ${rifa.precio_boleto}{" "}
-                <span className="text-sm font-normal text-zinc-500">MXN</span>
+                {rifa.precio_boleto}{" "}
+                <span className="text-sm font-normal text-zinc-500">BS</span>
               </span>
             </div>
 

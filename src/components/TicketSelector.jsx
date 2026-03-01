@@ -33,29 +33,26 @@ export default function TicketSelector({
         {opciones.map((num) => (
           <button
             key={num}
-            onClick={() => setCantidad(num)}
-            className={`py-3 rounded-xl font-bold transition-all ${
-              cantidad === num
-                ? "bg-yellow-500/20 border-2 border-yellow-500 text-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.3)]"
-                : "bg-zinc-800/50 border border-zinc-700 text-zinc-400 hover:border-zinc-500"
-            }`}
+            onClick={() => setCantidad((prev) => prev + num)}
+            className="py-3 rounded-xl font-bold transition-all bg-zinc-800/50 border border-zinc-700 text-zinc-400 hover:border-emerald-500 hover:text-emerald-500 hover:bg-emerald-500/5"
           >
-            {num}
+            +{num}
           </button>
         ))}
       </div>
 
       <div className="flex items-center justify-center gap-8 mb-8">
         <button
-          onClick={() => setCantidad(Math.max(1, cantidad - 1))}
-          className="w-12 h-12 rounded-full border-2 border-red-500/50 text-red-500 text-2xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all"
+          onClick={() => setCantidad((prev) => Math.max(3, prev - 1))}
+          className="w-12 h-12 rounded-full border-2 border-red-500/50 text-red-500 text-2xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+          disabled={cantidad <= 3}
         >
           {" "}
           −{" "}
         </button>
         <span className="text-6xl font-black tabular-nums">{cantidad}</span>
         <button
-          onClick={() => setCantidad(cantidad + 1)}
+          onClick={() => setCantidad((prev) => prev + 1)}
           className="w-12 h-12 rounded-full border-2 border-emerald-500/50 text-emerald-500 text-2xl flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-all"
         >
           {" "}
@@ -64,10 +61,10 @@ export default function TicketSelector({
       </div>
 
       <div className="border-t border-zinc-800 pt-6 flex justify-between items-end">
-        <p className="text-zinc-500 font-medium">Inversión Total</p>
-        <p className="text-4xl font-black text-yellow-500">
-          ${total.toLocaleString()}.00{" "}
-          <span className="text-sm text-zinc-400">MXN</span>
+        <p className="text-zinc-500 font-medium">Monto Total</p>
+        <p className="text-4xl font-black text-emerald-500">
+          {total.toLocaleString()}
+          <span className="text-sm text-zinc-400 ml-2">BS</span>
         </p>
       </div>
     </section>
