@@ -19,6 +19,7 @@ export default async function RifaDetallePage(props) {
   }
 
   const progreso = (rifa.boletos_vendidos / rifa.total_boletos) * 100;
+  const porcentaje = Math.round(progreso);
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-zinc-950 py-12 px-6">
@@ -81,10 +82,10 @@ export default async function RifaDetallePage(props) {
               <div className="space-y-4">
                 <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
                   <span className="text-emerald-500">
-                    {rifa.boletos_vendidos} VENDIDOS
+                    {porcentaje}% VENDIDO
                   </span>
                   <span className="text-zinc-400">
-                    {rifa.total_boletos - rifa.boletos_vendidos} RESTANTES
+                    {100 - porcentaje}% RESTANTE
                   </span>
                 </div>
                 <div className="w-full bg-zinc-100 dark:bg-zinc-800 rounded-full h-3 overflow-hidden">

@@ -48,13 +48,11 @@ export default function RifaCard({ rifa }) {
         <div className="mt-auto">
           <div className="flex justify-between text-[10px] font-black mb-2 uppercase tracking-widest text-zinc-500">
             <div className="flex flex-col">
-              <span className="text-emerald-500">
-                {rifa.boletos_vendidos || 0} VENDIDOS
-              </span>
+              <span className="text-emerald-500">{porcentaje}% VENDIDO</span>
             </div>
             <div className="text-right flex flex-col">
               <span className="text-zinc-400">
-                {rifa.total_boletos - (rifa.boletos_vendidos || 0)} RESTANTES
+                {100 - porcentaje}% RESTANTE
               </span>
             </div>
           </div>
