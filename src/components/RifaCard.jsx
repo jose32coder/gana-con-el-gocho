@@ -2,7 +2,7 @@
 import Link from "next/link";
 import Image from "next/image";
 
-export default function RifaCard({ rifa }) {
+export default function RifaCard({ rifa, priority = false }) {
   const progreso = (rifa.boletos_vendidos / rifa.total_boletos) * 100;
   const porcentaje = Math.round(
     (rifa.boletos_vendidos / rifa.total_boletos) * 100,
@@ -26,6 +26,7 @@ export default function RifaCard({ rifa }) {
           src={rifa.imagen_url || "/placeholder-rifa.jpg"}
           alt={rifa.nombre}
           fill
+          priority={priority}
           className="object-cover group-hover:scale-105 transition-transform duration-500"
         />
         <div className="absolute top-3 right-3 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold shadow-sm border border-zinc-200 dark:border-zinc-700">

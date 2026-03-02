@@ -54,12 +54,12 @@ export default async function HomePage() {
           </div>
         ) : (
           <div className="flex flex-wrap justify-center gap-8 w-full">
-            {rifas.map((rifa) => (
+            {rifas.map((rifa, index) => (
               <div
                 key={rifa.slug}
                 className="w-full md:w-[calc(50%-2rem)] lg:w-[calc(33.333%-2rem)] max-w-sm"
               >
-                <RifaCard rifa={rifa} />
+                <RifaCard rifa={rifa} priority={index < 3} />
               </div>
             ))}
           </div>
