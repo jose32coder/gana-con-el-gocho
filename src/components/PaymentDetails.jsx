@@ -72,35 +72,49 @@ export default function PaymentDetails({ method, amount, folio }) {
       </div>
     );
 
-  const paymentData = {
-    pago_movil: {
-      title: "Pago Móvil",
-      icon: <Smartphone className="text-emerald-500" />,
-      details: [
-        {
-          label: "Banco",
-          value: dynamicData?.pago_movil?.banco || "Cargando...",
+  const getMethodConfig = (methodKey, data) => {
+    const configs = {
+      pago_movil: {
+        title: "Pago Móvil",
+        icon: <Smartphone className="text-emerald-500" />,
+        fields: {
+          banco: "Banco",
+          telefono: "Teléfono",
+          cedula: "Cédula",
         },
-        {
-          label: "Cédula",
-          value: dynamicData?.pago_movil?.cedula || "Cargando...",
+      },
+      nequi: {
+        title: "Nequi",
+        icon: <Smartphone className="text-emerald-500" />,
+        fields: {
+          numero: "Número",
+          nombre: "Nombre",
         },
-        {
-          label: "Teléfono",
-          value: dynamicData?.pago_movil?.telefono || "Cargando...",
+      },
+      zelle: {
+        title: "Zelle",
+        icon: <Smartphone className="text-emerald-500" />,
+        fields: {
+          correo: "Correo",
+          nombre: "Nombre",
         },
-      ],
-    },
-    nequi: {
-      title: "Nequi",
-      icon: <Smartphone className="text-emerald-500" />,
-      details: [
-        { label: "Número", value: dynamicData?.nequi?.numero || "Cargando..." },
-        { label: "Nombre", value: dynamicData?.nequi?.nombre || "Cargando..." },
-      ],
-    },
+      },
+    };
+
+    const config = configs[methodKey] || configs.pago_movil;
+    const methodData = data?.[methodKey] || {};
+
+    return {
+      title: config.title,
+      icon: config.icon,
+      details: Object.keys(config.fields).map((fieldKey) => ({
+        label: config.fields[fieldKey],
+        value: methodData[fieldKey] || "No configurado",
+      })),
+    };
   };
-  const data = paymentData[method] || paymentData.pago_movil;
+
+  const data = getMethodConfig(method, dynamicData);
 
   const copyAll = () => {
     const allText = data.details

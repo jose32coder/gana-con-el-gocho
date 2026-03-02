@@ -104,15 +104,15 @@ export default async function FinanzasPage({ searchParams }) {
           </p>
         </div>
 
-        <div className="flex bg-zinc-900 p-1 rounded-2xl border border-zinc-800 self-start">
+        <div className="flex bg-zinc-900/80 p-1.5 rounded-2xl border border-zinc-800 self-start shadow-inner backdrop-blur-sm">
           {rangeButtons.map((btn) => (
             <Link
               key={btn.value}
               href={`/admin/finanzas?range=${btn.value}`}
-              className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+              className={`px-8 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 flex items-center justify-center ${
                 range === btn.value
-                  ? "bg-emerald-500 text-black shadow-lg shadow-emerald-500/20"
-                  : "text-zinc-500 hover:text-white"
+                  ? "bg-emerald-500 text-black shadow-lg shadow-emerald-500/20 scale-105 z-10"
+                  : "text-zinc-500 hover:text-white hover:bg-zinc-800/10"
               }`}
             >
               {btn.label}

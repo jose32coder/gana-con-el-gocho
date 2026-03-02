@@ -73,11 +73,11 @@ export default function TicketsResultModal({
                 </p>
               </div>
 
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-3 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
                 {tickets.split(",").map((num, i) => (
                   <div
                     key={i}
-                    className="w-14 h-14 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center text-xl font-mono font-black text-emerald-400 shadow-xl"
+                    className="w-14 h-14 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center text-xl font-mono font-black text-emerald-400 shadow-xl shrink-0"
                   >
                     {num.trim()}
                   </div>

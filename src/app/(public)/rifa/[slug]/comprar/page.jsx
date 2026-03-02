@@ -96,25 +96,23 @@ export default function ComprarRifaPage(props) {
         .substring(2, 6)
         .toUpperCase()}`;
 
-      // 2. Subir imagen a Storage
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${folio}.${fileExt}`;
-      const filePath = `${fileName}`;
+      // 2. Subir imagen a Cloudinary (API propia)
+      const uploadData = new FormData();
+      uploadData.append("file", file);
+      uploadData.append("folder", "comprobantes");
 
-      const { error: uploadError } = await supabase.storage
-        .from("comprobantes") // <--- Minúsculas, igual que en el dashboard
-        .upload(filePath, file);
+      const uploadRes = await fetch("/api/upload", {
+        method: "POST",
+        body: uploadData,
+      });
 
-      if (uploadError) {
-        console.error("Upload Error:", uploadError);
+      const uploadResult = await uploadRes.json();
+
+      if (!uploadResult.url) {
         throw new Error(
-          `Error al subir el comprobante: ${uploadError.message}`,
+          `Error al subir el comprobante: ${uploadResult.error || "Desconocido"}`,
         );
       }
-
-      const { data: publicUrlData } = supabase.storage
-        .from("comprobantes") // También aquí en minúsculas
-        .getPublicUrl(filePath);
 
       // 3. Registrar en base de datos (Endpoint API)
       const res = await fetch("/api/comprar", {
@@ -127,7 +125,7 @@ export default function ComprarRifaPage(props) {
           ...formData, // nombre, cedula, telefono, correo
           metodo_pago: metodoPago,
           referencia_pago: referencia,
-          comprobante_url: publicUrlData.publicUrl,
+          comprobante_url: uploadResult.url,
           folio: folio,
         }),
       });
@@ -199,6 +197,10 @@ export default function ComprarRifaPage(props) {
       <BuyerDataModal
         isOpen={isDataModalOpen}
         onClose={() => setIsDataModalOpen(false)}
+        onBack={() => {
+          setIsDataModalOpen(false);
+          setIsMethodModalOpen(true);
+        }}
         formData={formData}
         setFormData={setFormData}
         onSubmit={handleDataSubmit}
@@ -207,6 +209,10 @@ export default function ComprarRifaPage(props) {
       <PaymentUploadModal
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
+        onBack={() => {
+          setIsUploadModalOpen(false);
+          setIsDataModalOpen(true);
+        }}
         onFinish={handleFinalizarCompra}
         method={metodoPago}
         amount={totalActual}

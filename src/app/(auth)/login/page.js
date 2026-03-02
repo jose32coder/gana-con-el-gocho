@@ -35,7 +35,9 @@ export default function LoginPage() {
       <div className="max-w-md w-full">
         <div className="text-center mb-10">
           <h1 className="text-4xl font-black text-white mb-2">Panel Admin</h1>
-          <p className="text-zinc-500">Ingresa tus credenciales para continuar</p>
+          <p className="text-zinc-500">
+            Ingresa tus credenciales para continuar
+          </p>
         </div>
 
         <div className="bg-zinc-900 border border-zinc-800 p-8 rounded-3xl shadow-2xl relative overflow-hidden">
@@ -88,7 +90,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center mt-8 text-zinc-600 text-sm">
-          &copy; {new Date().getFullYear()} Rifas App Admin
+          &copy; {new Date().getFullYear()} Gana con el Gocho Admin
         </p>
       </div>
     </div>

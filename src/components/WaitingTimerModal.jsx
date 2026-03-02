@@ -21,7 +21,8 @@ export default function WaitingTimerModal({
       setSeconds((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          onTimeout();
+          // Llamar al timeout fuera del proceso de actualización de estado
+          setTimeout(() => onTimeout(), 0);
           return 0;
         }
         return prev - 1;

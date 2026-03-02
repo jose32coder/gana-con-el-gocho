@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase-client";
 import { CreditCard, Landmark, Smartphone, Wallet } from "lucide-react";
 
 export default function PaymentMethodModal({
@@ -9,23 +11,50 @@ export default function PaymentMethodModal({
   totalAmount,
   ticketCount,
 }) {
+  const [activeMethods, setActiveMethods] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchActiveMethods() {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from("configuracion")
+        .select("valor")
+        .eq("clave", "datos_pago")
+        .single();
+
+      if (data?.valor) {
+        const configuredKeys = Object.keys(data.valor);
+        const allMethods = [
+          {
+            id: "pago_movil",
+            name: "Pago Móvil",
+            icon: <Smartphone className="text-emerald-500" />,
+            detail: "Venezuela",
+          },
+          {
+            id: "nequi",
+            name: "Nequi",
+            icon: <Smartphone className="text-emerald-500" />,
+            detail: "Colombia",
+          },
+          {
+            id: "zelle",
+            name: "Zelle",
+            icon: <Smartphone className="text-blue-500" />,
+            detail: "Internacional",
+          },
+        ];
+        setActiveMethods(
+          allMethods.filter((m) => configuredKeys.includes(m.id)),
+        );
+      }
+      setLoading(false);
+    }
+    if (isOpen) fetchActiveMethods();
+  }, [isOpen]);
+
   if (!isOpen) return null;
-
-  const methods = [
-    {
-      id: "pago_movil",
-      name: "Pago Móvil",
-      icon: <Smartphone className="text-emerald-500" />,
-      detail: "Venezuela",
-    },
-
-    {
-      id: "nequi",
-      name: "Nequi",
-      icon: <Smartphone className="text-emerald-500" />,
-      detail: "Colombia",
-    },
-  ];
 
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center p-6 bg-black/90 backdrop-blur-md">
@@ -57,25 +86,35 @@ export default function PaymentMethodModal({
             Selecciona tu método de pago
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {methods.map((method) => (
-              <button
-                key={method.id}
-                onClick={() => onSelect(method.id)}
-                className="flex items-center gap-4 p-5 bg-zinc-950/50 border border-zinc-800 rounded-2xl hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-all text-left group"
-              >
-                <div className="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  {method.icon}
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-white uppercase">
-                    {method.name}
-                  </p>
-                  <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
-                    {method.detail}
-                  </p>
-                </div>
-              </button>
-            ))}
+            {loading ? (
+              <div className="col-span-2 py-10 text-center animate-pulse text-zinc-500 text-[10px] font-black uppercase tracking-widest">
+                Cargando métodos...
+              </div>
+            ) : activeMethods.length > 0 ? (
+              activeMethods.map((method) => (
+                <button
+                  key={method.id}
+                  onClick={() => onSelect(method.id)}
+                  className="flex items-center gap-4 p-5 bg-zinc-950/50 border border-zinc-800 rounded-2xl hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-all text-left group"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    {method.icon}
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-white uppercase">
+                      {method.name}
+                    </p>
+                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
+                      {method.detail}
+                    </p>
+                  </div>
+                </button>
+              ))
+            ) : (
+              <div className="col-span-2 py-10 text-center text-zinc-500 text-[10px] font-black uppercase tracking-widest">
+                No hay métodos disponibles
+              </div>
+            )}
           </div>
         </div>
 

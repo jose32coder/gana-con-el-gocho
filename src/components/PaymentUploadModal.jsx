@@ -8,6 +8,7 @@ export default function PaymentUploadModal({
   isOpen,
   onClose,
   onFinish,
+  onBack,
   method,
   amount,
   folio,
@@ -17,6 +18,32 @@ export default function PaymentUploadModal({
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const fileInputRef = useRef(null);
+
+  const methodConfig = {
+    pago_movil: {
+      label: "Últimos 6 dígitos de la referencia",
+      placeholder: "000000",
+      validate: (v) => v.length === 6 && /^\d+$/.test(v),
+      error: "La referencia de Pago Móvil debe tener 6 dígitos numéricos",
+      format: (v) => v.replace(/\D/g, "").slice(0, 6),
+    },
+    zelle: {
+      label: "Referencia o Nombre del Emisor",
+      placeholder: "Ej: Confirmación / Nombre",
+      validate: (v) => v.length >= 3,
+      error: "Ingresa una referencia o nombre válido (mín. 3 caracteres)",
+      format: (v) => v,
+    },
+    nequi: {
+      label: "Número de Referencia",
+      placeholder: "Ej: M8C123...",
+      validate: (v) => v.length >= 4,
+      error: "Ingresa la referencia de Nequi",
+      format: (v) => v,
+    },
+  };
+
+  const config = methodConfig[method] || methodConfig.pago_movil;
 
   if (!isOpen) return null;
 
@@ -35,8 +62,7 @@ export default function PaymentUploadModal({
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!file) return alert("Por favor sube el comprobante de pago");
-    if (referencia.length !== 6)
-      return alert("La referencia debe tener 6 dígitos");
+    if (!config.validate(referencia)) return alert(config.error);
 
     onFinish(file, referencia);
   };
@@ -71,18 +97,15 @@ export default function PaymentUploadModal({
           <div className="space-y-4">
             <div className="space-y-2">
               <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] ml-1">
-                Últimos 6 dígitos de la referencia
+                {config.label}
               </label>
               <input
                 type="text"
-                maxLength={6}
                 required
                 value={referencia}
-                onChange={(e) =>
-                  setReferencia(e.target.value.replace(/\D/g, ""))
-                }
+                onChange={(e) => setReferencia(config.format(e.target.value))}
                 className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl px-6 py-4 text-white text-center text-2xl font-mono focus:outline-none focus:border-emerald-500 transition-all placeholder:text-zinc-800"
-                placeholder="000000"
+                placeholder={config.placeholder}
               />
             </div>
 
@@ -139,14 +162,23 @@ export default function PaymentUploadModal({
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={procesando || !file || referencia.length !== 6}
-            className="premium-button w-full py-5 text-xl flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <CheckCircle size={24} />
-            {procesando ? "Verificando Pago..." : "Finalizar y Pagar"}
-          </button>
+          <div className="flex flex-col sm:grid sm:grid-cols-2 gap-4">
+            <button
+              type="button"
+              onClick={onBack}
+              className="w-full py-5 text-zinc-500 hover:text-white font-black uppercase tracking-widest text-sm transition-colors border border-zinc-800 rounded-2xl order-2 sm:order-1"
+            >
+              Cambiar Método
+            </button>
+            <button
+              type="submit"
+              disabled={procesando || !file || !config.validate(referencia)}
+              className="premium-button w-full py-5 text-xl cursor-pointer flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2"
+            >
+              <CheckCircle size={24} />
+              {procesando ? "Verificando Pago..." : "Finalizar y Pagar"}
+            </button>
+          </div>
         </form>
       </div>
     </div>

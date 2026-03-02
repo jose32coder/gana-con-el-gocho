@@ -121,6 +121,23 @@ export async function POST(request) {
       },
     ]);
 
+    // 6. Notificar al admin vía Telegram (Opcional, no bloqueante)
+    try {
+      const { notifyAdmin } = require("@/lib/notifications");
+      notifyAdmin({
+        cliente: nombre,
+        rifa: rifa.nombre,
+        cantidad: cantidad,
+        monto: cantidad * rifa.precio_boleto,
+        metodo: metodo_pago,
+        folio: finalFolio,
+        referencia: referencia_pago,
+        comprobante_url: comprobante_url,
+      });
+    } catch (err) {
+      console.error("Error notifying admin:", err);
+    }
+
     revalidatePath(`/rifa/${rifa.slug}`);
     revalidatePath("/admin");
     revalidatePath("/admin/finanzas");

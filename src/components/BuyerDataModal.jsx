@@ -6,6 +6,7 @@ export default function BuyerDataModal({
   isOpen,
   onClose,
   onSubmit,
+  onBack,
   formData,
   setFormData,
   procesando,
@@ -127,13 +128,22 @@ export default function BuyerDataModal({
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={procesando}
-            className="premium-button w-full py-5 text-lg"
-          >
-            {procesando ? "Guardando..." : "Continuar al Pago"}
-          </button>
+          <div className="flex flex-col sm:grid sm:grid-cols-2 gap-4">
+            <button
+              type="button"
+              onClick={onBack}
+              className="w-full py-5 text-zinc-500 hover:text-white font-black uppercase tracking-widest text-sm transition-colors border border-zinc-800 rounded-2xl order-2 sm:order-1"
+            >
+              Regresar
+            </button>
+            <button
+              type="submit"
+              disabled={procesando}
+              className="premium-button w-full py-5 text-lg order-1 sm:order-2"
+            >
+              {procesando ? "Guardando..." : "Continuar al Pago"}
+            </button>
+          </div>
         </form>
       </div>
     </div>
