@@ -27,6 +27,7 @@ export default function RifaCard({ rifa, priority = false }) {
           alt={rifa.nombre}
           fill
           priority={priority}
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-cover group-hover:scale-105 transition-transform duration-500"
         />
         <div className="absolute top-3 right-3 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold shadow-sm border border-zinc-200 dark:border-zinc-700">

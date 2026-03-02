@@ -3,6 +3,7 @@
 import RifaCard from "@/components/RifaCard";
 import { createClient } from "@/lib/supabase-server";
 import { Clover } from "lucide-react";
+export const revalidate = 60; // Revalidar cada minuto
 
 export default async function HomePage() {
   const supabase = await createClient();
