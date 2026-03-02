@@ -4,10 +4,20 @@
 
 export async function notifyAdmin(data) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
+  const chatIdsStr = process.env.TELEGRAM_CHAT_ID;
 
-  if (!token || !chatId) {
+  if (!token || !chatIdsStr) {
     console.error("Telegram credentials missing in .env");
+    return;
+  }
+
+  const chatIds = chatIdsStr
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean);
+
+  if (chatIds.length === 0) {
+    console.error("No valid Telegram Chat IDs found");
     return;
   }
 
@@ -47,34 +57,37 @@ Si estás viendo esto, tu bot de Telegram está correctamente vinculado con <b>G
     `.trim();
   }
 
-  try {
-    const isPhoto = !!comprobante_url;
-    const method = isPhoto ? "sendPhoto" : "sendMessage";
-    const url = `https://api.telegram.org/bot${token}/${method}`;
+  // Send to all Chat IDs
+  for (const chatId of chatIds) {
+    try {
+      const isPhoto = !!comprobante_url;
+      const method = isPhoto ? "sendPhoto" : "sendMessage";
+      const url = `https://api.telegram.org/bot${token}/${method}`;
 
-    const payload = {
-      chat_id: chatId,
-      parse_mode: "HTML",
-    };
+      const payload = {
+        chat_id: chatId,
+        parse_mode: "HTML",
+      };
 
-    if (isPhoto) {
-      payload.photo = comprobante_url;
-      payload.caption = message;
-    } else {
-      payload.text = message;
+      if (isPhoto) {
+        payload.photo = comprobante_url;
+        payload.caption = message;
+      } else {
+        payload.text = message;
+      }
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error(`Telegram API Error for ID ${chatId}:`, errorData);
+      }
+    } catch (error) {
+      console.error(`Error sending Telegram message to ID ${chatId}:`, error);
     }
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Telegram API Error:", errorData);
-    }
-  } catch (error) {
-    console.error("Error sending Telegram message:", error);
   }
 }

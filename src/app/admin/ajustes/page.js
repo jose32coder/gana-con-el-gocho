@@ -160,7 +160,7 @@ export default function AjustesAdminPage() {
         >
           <Ticket size={16} /> Opciones Tickets
         </button>
-        {/* <button
+        <button
           onClick={handleTestTelegram}
           disabled={testingTelegram}
           className="px-6 flex items-center justify-center gap-2 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest text-zinc-500 hover:text-white transition-all disabled:opacity-50"
@@ -168,7 +168,7 @@ export default function AjustesAdminPage() {
         >
           <Send size={16} className={testingTelegram ? "animate-ping" : ""} />
           <span className="hidden md:inline">Probar Bot</span>
-        </button> */}
+        </button>
       </div>
 
       {status && (
