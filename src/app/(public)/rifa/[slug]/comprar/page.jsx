@@ -261,25 +261,29 @@ export default function ComprarRifaPage(props) {
             <TopBuyers buyers={rifa.top_compradores || []} />
 
             <div className="premium-card p-8">
-              <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-2">
-                <span className="text-emerald-500">
-                  {rifa.boletos_vendidos} Vendidos
-                </span>
-                <span>
-                  {Math.round(
-                    (rifa.boletos_vendidos / rifa.total_boletos) * 100,
-                  )}
-                  %
-                </span>
-              </div>
-              <div className="w-full bg-zinc-950 h-3 rounded-full overflow-hidden border border-zinc-900">
-                <div
-                  className="bg-emerald-500 h-full rounded-full shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all duration-1000"
-                  style={{
-                    width: `${(rifa.boletos_vendidos / rifa.total_boletos) * 100}%`,
-                  }}
-                ></div>
-              </div>
+              {(() => {
+                const porcentaje = Math.round(
+                  (rifa.boletos_vendidos / rifa.total_boletos) * 100,
+                );
+                return (
+                  <>
+                    <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-2">
+                      <span className="text-emerald-500">
+                        {porcentaje}% VENDIDO
+                      </span>
+                      <span>{100 - porcentaje}% RESTANTE</span>
+                    </div>
+                    <div className="w-full bg-zinc-950 h-3 rounded-full overflow-hidden border border-zinc-900">
+                      <div
+                        className="bg-emerald-500 h-full rounded-full shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all duration-1000"
+                        style={{
+                          width: `${porcentaje}%`,
+                        }}
+                      ></div>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
           </div>
         </div>
