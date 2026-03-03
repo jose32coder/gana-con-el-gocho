@@ -68,8 +68,8 @@ export default function PaymentUploadModal({
   };
 
   return (
-    <div className="fixed inset-0 z-100 flex items-center justify-center p-6 bg-black/90 backdrop-blur-md overflow-y-auto">
-      <div className="premium-card max-w-2xl w-full p-8 md:p-10 my-8 space-y-8 animate-in fade-in zoom-in duration-300 relative">
+    <div className="fixed inset-0 z-100 flex items-start justify-center p-4 md:p-6 bg-black/90 backdrop-blur-md overflow-y-auto pt-10 pb-10">
+      <div className="premium-card max-w-2xl w-full p-5 md:p-10 space-y-6 md:space-y-8 animate-in fade-in zoom-in duration-300 relative">
         <button
           onClick={onClose}
           className="absolute top-6 right-6 text-zinc-500 hover:text-white transition-colors"
@@ -84,7 +84,7 @@ export default function PaymentUploadModal({
           <h2 className="text-3xl font-bold text-white uppercase tracking-tight">
             Finalizar Compra
           </h2>
-          <p className="text-zinc-500 text-sm font-medium uppercase tracking-widest">
+          <p className="text-zinc-500 text-xs font-medium uppercase tracking-widest">
             Sube tu comprobante para validar tu pago
           </p>
         </div>

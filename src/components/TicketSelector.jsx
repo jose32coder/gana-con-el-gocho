@@ -43,9 +43,9 @@ export default function TicketSelector({
 
       <div className="flex items-center justify-center gap-8 mb-8">
         <button
-          onClick={() => setCantidad((prev) => Math.max(3, prev - 1))}
+          onClick={() => setCantidad((prev) => Math.max(1, prev - 1))}
           className="w-12 h-12 rounded-full border-2 border-red-500/50 text-red-500 text-2xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-          disabled={cantidad <= 3}
+          disabled={cantidad <= 1}
         >
           {" "}
           −{" "}

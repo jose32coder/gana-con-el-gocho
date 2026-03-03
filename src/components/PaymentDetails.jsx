@@ -124,7 +124,7 @@ export default function PaymentDetails({ method, amount, folio }) {
   };
 
   return (
-    <div className="premium-card p-8 space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
+    <div className="premium-card p-5 md:p-8 space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
       <div className="text-center space-y-4">
         <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto border border-emerald-500/20">
           {data.icon}
@@ -138,15 +138,15 @@ export default function PaymentDetails({ method, amount, folio }) {
       <div className="space-y-4">
         <div className="bg-zinc-950 p-4 rounded-2xl border border-zinc-800 flex justify-between items-center">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-1">
-              Monto a Transferir
+            <p className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-zinc-500">
+              Monto a Cancelar
             </p>
             <p className="text-2xl font-black text-emerald-500">
-              ${amount.toLocaleString()}
+              {amount.toLocaleString()} Bs
             </p>
           </div>
-          <div className="text-right">
-            <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-1">
+          <div className="">
+            <p className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-1">
               Folio de Registro
             </p>
             <p className="text-sm font-mono text-white">{folio}</p>
