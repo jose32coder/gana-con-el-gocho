@@ -121,10 +121,10 @@ export async function POST(request) {
       },
     ]);
 
-    // 6. Notificar al admin vía Telegram (Opcional, no bloqueante)
+    // 6. Notificar al admin vía Telegram (Asegurar await para Vercel)
     try {
-      const { notifyAdmin } = require("@/lib/notifications");
-      notifyAdmin({
+      const { notifyAdmin } = await import("@/lib/notifications");
+      await notifyAdmin({
         cliente: nombre,
         rifa: rifa.nombre,
         cantidad: cantidad,
