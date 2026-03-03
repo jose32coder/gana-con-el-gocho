@@ -4,20 +4,16 @@
 
 export async function notifyAdmin(data) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatIdsStr = process.env.TELEGRAM_CHAT_ID;
 
-  if (!token || !chatIdsStr) {
-    console.error("Telegram credentials missing in .env");
-    return;
-  }
-
-  const chatIds = chatIdsStr
-    .split(",")
+  // Buscar todos los IDs en variables que empiecen por TELEGRAM_CHAT_ID
+  const chatIds = Object.keys(process.env)
+    .filter((key) => key.startsWith("TELEGRAM_CHAT_ID"))
+    .flatMap((key) => (process.env[key] || "").split(","))
     .map((id) => id.trim())
     .filter(Boolean);
 
-  if (chatIds.length === 0) {
-    console.error("No valid Telegram Chat IDs found");
+  if (!token || chatIds.length === 0) {
+    console.error("Telegram credentials missing or no valid Chat IDs found");
     return;
   }
 
