@@ -158,7 +158,9 @@ export default function BoletoTable({ initialData, rifasList = [] }) {
     return data.filter((b) => {
       const matchesSearch =
         b.comprador_nombre.toLowerCase().includes(search.toLowerCase()) ||
-        b.folio.toLowerCase().includes(search.toLowerCase());
+        b.folio.toLowerCase().includes(search.toLowerCase()) ||
+        (b.numero_ticket && b.numero_ticket.toString().includes(search)) ||
+        (b.numero_boleto && b.numero_boleto.toString().includes(search));
 
       const matchesStatus =
         statusFilter === "todos" || b.estado === statusFilter;

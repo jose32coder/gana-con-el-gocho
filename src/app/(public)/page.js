@@ -3,6 +3,8 @@
 import RifaCard from "@/components/RifaCard";
 import { createClient } from "@/lib/supabase-server";
 import { Clover } from "lucide-react";
+import WinnersSection from "@/components/WinnersSection";
+
 export const revalidate = 60; // Revalidar cada minuto
 
 export default async function HomePage() {
@@ -66,6 +68,9 @@ export default async function HomePage() {
           </div>
         )}
       </div>
+
+      {/* Nueva Sección de Ganadores */}
+      <WinnersSection />
     </main>
   );
 }

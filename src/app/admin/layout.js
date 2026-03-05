@@ -19,6 +19,7 @@ export default function AdminLayout({ children }) {
   const navItems = [
     { name: "Dashboard", href: "/admin", icon: "🏠" },
     { name: "Rifas", href: "/admin/rifas", icon: "🎟️" },
+    { name: "Ganadores", href: "/admin/ganadores", icon: "🏆" },
     { name: "Boletos", href: "/admin/boletos", icon: "💎" },
     { name: "Finanzas", href: "/admin/finanzas", icon: "📊" },
     { name: "Ajustes", href: "/admin/ajustes", icon: "⚙️" },
